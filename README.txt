@@ -94,3 +94,5 @@ http://pinout.xyz/pinout/wiringpi_gpio_pinout
 http://wiringpi.com/the-gpio-utility/
 
 http://raspberrypiguide.de/howtos/raspberry-pi-gpio-how-to/
+
+https://projects.drogon.net/raspberry-pi/wiringpi/the-gpio-utility/
