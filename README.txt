@@ -96,3 +96,6 @@ http://wiringpi.com/the-gpio-utility/
 http://raspberrypiguide.de/howtos/raspberry-pi-gpio-how-to/
 
 https://projects.drogon.net/raspberry-pi/wiringpi/the-gpio-utility/
+
+RemoteDebugging
+    https://sourceware.org/gdb/wiki/BuildingCrossGDBandGDBserver
