@@ -6,11 +6,11 @@ using namespace std;
 
 int main( int argc, const char** argv )
 {
-    Mat img = imread("MyPic.JPG", CV_LOAD_IMAGE_UNCHANGED); //read the image data in the file "MyPic.JPG" and store it in 'img'
+    Mat img = imread("cat1.jpg", CV_LOAD_IMAGE_UNCHANGED); //read the image data in the file "MyPic.JPG" and store it in 'img'
 
     if (img.empty()) //check whether the image is loaded or not
     {
-        cout << "Error : Image cannot be loaded..!!" << endl;
+        cout << "Error : Image cannot be loaded.." << endl;
         //system("pause"); //wait for a key press
         return -1;
     }
