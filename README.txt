@@ -99,7 +99,7 @@ https://projects.drogon.net/raspberry-pi/wiringpi/the-gpio-utility/
 
 RemoteDebugging
     https://sourceware.org/gdb/wiki/BuildingCrossGDBandGDBserver
-
+                                                                      cd b
 1
 2
 3
@@ -110,3 +110,38 @@ $ sudo rpi-update
 
 https://solderspot.wordpress.com/2016/02/04/cross-compiling-for-raspberry-pi-part-ii/
 https://aabdelfattah.wordpress.com/2014/03/08/cross-compiling-a-pie-the-raspberry-pi-ultimate-guide/
+
+
+PKG_CONFIG_PATH=`pwd` arm-linux-gnueabihf-pkg-config --libs --cflags libopencv_highgui
+
+-DCROSS_COMPILER_PATH=(path to compiler folder) cmake option.
+
+
+https://aplacetogeek.wordpress.com/qt-opencv-v4l-cross-compiling-raspberry-pi-beagle-bone/
+
+
+https://www.elektronik-kompendium.de/sites/raspberry-pi/2007061.htm
+,anonuid=501,anongid=20
+(mikemitterer, staff)
+
+exportfs -ra
+  133  service rpcbind restart
+  134  service nfs-kernel-server restart
+  135  service nfs-kernel-server status
+
+showmount -e 192.168.0.90
+    sudo mount -t nfs -o resvport 192.168.0.90:/lib lib
+    sudo mount -t nfs -o resvport 192.168.0.90:/usr usr
+
+    sudo mount -t nfs -o resvport 192.168.0.90:/home/pi/bin bin
+
+http://www.gtkdb.de/index_36_1976.html
+
+http://krypted.com/mac-os-x/create-groups-using-dscl/
+ dscl . create /Groups/nfsshare
+ dscl . create /Groups/nfsshare gid 1000
+
+dseditgroup -o edit -a mikemitterer -t user nfsshare
+
+
+https://www.raspberrypi.org/documentation/remote-access/vnc/
