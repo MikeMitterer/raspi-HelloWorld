@@ -6,7 +6,7 @@ int main (void) {
     // Pin 27 muss exportiert sein (gpio export 27 out)
     int pin = 27;
 
-    printf("*Raspberry Pi wiringPi blink test..\n");
+    printf("*Raspberry Pi wiringPi blink test...\n");
 
     // http://wiringpi.com/reference/setup/
     // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
