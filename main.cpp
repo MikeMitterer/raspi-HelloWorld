@@ -1,29 +1,26 @@
-#include <wiringPi.h>
-#include <stdio.h>
-#include <cstdlib>
+#include <opencv2/highgui/highgui.hpp>
+#include <iostream>
 
-int main (void) {
-    // Pin 27 muss exportiert sein (gpio export 27 out)
-    int pin = 27;
+using namespace cv;
+using namespace std;
 
-    printf("*Raspberry Pi wiringPi blink test\n");
+int main( int argc, const char** argv )
+{
+    Mat img = imread("MyPic.JPG", CV_LOAD_IMAGE_UNCHANGED); //read the image data in the file "MyPic.JPG" and store it in 'img'
 
-    // http://wiringpi.com/reference/setup/
-    // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
-    if (wiringPiSetupSys() == -1) {
-        exit (1);
+    if (img.empty()) //check whether the image is loaded or not
+    {
+        cout << "Error : Image cannot be loaded..!!" << endl;
+        //system("pause"); //wait for a key press
+        return -1;
     }
 
-    pinMode(pin, OUTPUT);
+    namedWindow("MyWindow", CV_WINDOW_AUTOSIZE); //create a window with the name "MyWindow"
+    imshow("MyWindow", img); //display the image which is stored in the 'img' in the "MyWindow" window
 
-    for (int counter{0}; counter < 5; counter++){
-        printf("LED On:\n");
-        digitalWrite(pin, 1);
-        delay(250);
-        printf("LED Off %d\n",counter);
-        digitalWrite(pin, 0);
-        delay(250);
-    }
+    waitKey(0); //wait infinite time for a keypress
+
+    destroyWindow("MyWindow"); //destroy the window with the name, "MyWindow"
 
     return 0;
 }

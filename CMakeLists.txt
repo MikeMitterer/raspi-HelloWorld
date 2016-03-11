@@ -8,7 +8,10 @@ include(Config)
 project(RaspiHelloWorld)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --verbose")
 #SET(GCC_COVERAGE_LINK_FLAGS    "--specs=nosys.specs")
+
+set_property(GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS TRUE)
 
 set(ROOTFS "/Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs")
 set(RASPIAN "/usr/local/linaro/arm-linux-gnueabihf-raspbian")
@@ -17,8 +20,15 @@ set(RASPIAN_LIBC "${RASPIAN}/arm-linux-gnueabihf/libc")
 message( STATUS "MYROOTFS:   " ${ROOTFS} )
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
-
+    ${ROOTFS}/lib ${ROOTFS}/lib/arm-linux-gnueabihf
+    ${ROOTFS}/usr/lib ${ROOTFS}/usr/lib/arm-linux-gnueabihf
 )
+
+set(CMAKE_MODULE_PATH
+        ${ROOTFS}
+        ${ROOTFS}/lib ${ROOTFS}/lib/arm-linux-gnueabihf
+        ${ROOTFS}/usr/lib ${ROOTFS}/usr/lib/arm-linux-gnueabihf
+        )
 
 find_library(WIRINGPI
         NAMES libwiringPi libwiringPi.so
@@ -40,6 +50,27 @@ if(NOT ${PTHREAD})
 endif()
 message( STATUS "PTHREAD:    " ${PTHREAD} )
 
+
+#find_library(OPENCV
+#        NAMES libopencv_core.so.2.4
+#        HINTS "
+#              ${ROOTFS}/lib ${ROOTFS}/lib/arm-linux-gnueabihf
+#              ${ROOTFS}/usr/lib ${ROOTFS}/usr/lib/arm-linux-gnueabihf
+#              "
+#        )
+#message( STATUS "OPENCV:   " ${OPENCV} )
+#
+#find_library(OPENCV_HIGHGUI
+#        NAMES libopencv_highgui.so.2.4
+#        HINTS "
+#              ${ROOTFS}/lib ${ROOTFS}/lib/arm-linux-gnueabihf
+#              ${ROOTFS}/usr/lib ${ROOTFS}/usr/lib/arm-linux-gnueabihf
+#              "
+#        )
+#message( STATUS "OPENCV_HIGHGUI:   " ${OPENCV_HIGHGUI} )
+
+find_package( OpenCV REQUIRED )
+
 set(SOURCE_FILES main.cpp)
 
 add_executable(RaspiHelloWorld ${SOURCE_FILES})
@@ -52,5 +83,6 @@ target_include_directories(
 
 target_link_libraries (
         RaspiHelloWorld
-        ${PTHREAD} ${WIRINGPI}
+#        ${PTHREAD} ${WIRINGPI}
+        ${OpenCV_LIBS}
 )

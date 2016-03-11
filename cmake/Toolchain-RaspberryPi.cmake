@@ -13,7 +13,9 @@ SET(CMAKE_AR ${XCOMPILER}ar)
 SET(CMAKE_RANLIB ${XCOMPILER}ranlib)
 
 # where is the target environment
-SET(CMAKE_FIND_ROOT_PATH /Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs)
+SET(PIROOT /Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs)
+SET(CMAKE_SYSROOT ${PIROOT})
+SET(CMAKE_FIND_ROOT_PATH ${PIROOT})
 
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)

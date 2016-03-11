@@ -40,7 +40,7 @@ brew cask uninstall gcc-arm-embedded
 rsync -rl --delete-after --safe-links pi@192.168.1.PI:/{lib,usr} $HOME/raspberrypi/rootfs
 
 rsync -rl --delete-after --safe-links pi@192.168.0.90:/{lib,usr} /Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs
-
+rsync -rlv --delete --safe-links --exclude-from 'exclude-list.txt' pi@192.168.0.90:/{lib,usr} /Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs
 
 /usr/local/linaro/arm-linux-gnueabihf-raspbian/bin
 
@@ -99,3 +99,14 @@ https://projects.drogon.net/raspberry-pi/wiringpi/the-gpio-utility/
 
 RemoteDebugging
     https://sourceware.org/gdb/wiki/BuildingCrossGDBandGDBserver
+
+1
+2
+3
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo rpi-update
+
+
+https://solderspot.wordpress.com/2016/02/04/cross-compiling-for-raspberry-pi-part-ii/
+https://aabdelfattah.wordpress.com/2014/03/08/cross-compiling-a-pie-the-raspberry-pi-ultimate-guide/
