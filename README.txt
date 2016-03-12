@@ -125,9 +125,9 @@ https://www.elektronik-kompendium.de/sites/raspberry-pi/2007061.htm
 (mikemitterer, staff)
 
 exportfs -ra
-  133  service rpcbind restart
-  134  service nfs-kernel-server restart
-  135  service nfs-kernel-server status
+  service rpcbind restart
+  service nfs-kernel-server restart
+  service nfs-kernel-server status
 
 showmount -e 192.168.0.90
     sudo mount -t nfs -o resvport 192.168.0.90:/lib lib
