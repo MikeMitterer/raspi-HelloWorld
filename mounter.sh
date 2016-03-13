@@ -89,7 +89,7 @@ listShares() {
      showmount -e 192.168.0.90
 }
 
-unmountbin() {
+unmountBin() {
      sudo umount "bin"
 }
 

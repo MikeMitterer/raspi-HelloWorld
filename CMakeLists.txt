@@ -8,7 +8,7 @@ include(Config)
 
 project(RaspiHelloWorld)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --verbose")
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
@@ -16,13 +16,23 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
     ${PIROOT}/usr/lib ${PIROOT}/usr/lib/arm-linux-gnueabihf
 )
 
-find_library(WIRINGPI
-        NAMES libwiringPi libwiringPi.so
-        HINTS "
-              ${PIROOT}/lib ${PIROOT}/lib/arm-linux-gnueabihf
-              ${PIROOT}/usr/lib ${PIROOT}/usr/lib/arm-linux-gnueabihf
-              "
-)
+# ┌──────────────────────────────────────────────────────────────────┐
+# │  Qt                                                              │
+# └──────────────────────────────────────────────────────────────────┘
+
+set(QT5DIR "${PIROOT}/usr/lib/arm-linux-gnueabihf/qt5")
+
+set(CMAKE_PREFIX_PATH ${QT5DIR} ${CMAKE_PREFIX_PATH})
+message( WARNING "CMAKE_PREFIX_PATH:       " ${CMAKE_PREFIX_PATH} )
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOMOC ON)
+
+find_package(Qt5Core
+        PATHS "${PIROOT}/usr/lib/arm-linux-gnueabihf/cmake" ${QT5DIR}
+        REQUIRED)
+#find_package(Qt5Widgets REQUIRED)
+
 
 # Sample - findet alle SOs
 # file(GLOB_RECURSE ALLLIBS
@@ -31,19 +41,18 @@ find_library(WIRINGPI
 # )
 
 
-find_package( OpenCV REQUIRED )
-
 set(SOURCE_FILES main.cpp)
 
 add_executable(RaspiHelloWorld ${SOURCE_FILES})
 
 target_include_directories(
         RaspiHelloWorld
-        PUBLIC ${PIROOT}/usr/include
-        PUBLIC ${PIROOT}/usr/include/arm-linux-gnueabihf
+        PUBLIC "${PIROOT}/usr/include"
+        PUBLIC "${PIROOT}/usr/include/arm-linux-gnueabihf"
 )
 
 target_link_libraries (
         RaspiHelloWorld
-        ${OpenCV_LIBS}
 )
+
+qt5_use_modules(RaspiHelloWorld Widgets)

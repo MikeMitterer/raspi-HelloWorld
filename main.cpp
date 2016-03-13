@@ -1,26 +1,55 @@
-#include <opencv2/highgui/highgui.hpp>
+#include <QApplication>
+#include <qcommandlineparser.h>
 #include <iostream>
+//#include "interface/MainWindow.hpp"
+#include <QString>
+#include <QDateTime>
+#include <QDebug>
 
-using namespace cv;
 using namespace std;
 
-int main( int argc, const char** argv )
-{
-    Mat img = imread("cat1.jpg", CV_LOAD_IMAGE_UNCHANGED); //read the image data in the file "MyPic.JPG" and store it in 'img'
+int main(int argc, char *argv[]) {
+    QCoreApplication app(argc, argv);
+    QCoreApplication::setApplicationName("my-copy-program");
+    QCoreApplication::setApplicationVersion("1.0");
 
-    if (img.empty()) //check whether the image is loaded or not
-    {
-        cout << "Error : Image cannot be loaded.." << endl;
-        //system("pause"); //wait for a key press
-        return -1;
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Test helper");
+    parser.addHelpOption();
+    parser.addVersionOption();
+    parser.addPositionalArgument("source", QCoreApplication::translate("main", "Source file to copy."));
+    parser.addPositionalArgument("destination", QCoreApplication::translate("main", "Destination directory."));
+
+    // A boolean option with a single name (-p)
+    QCommandLineOption showProgressOption("p", QCoreApplication::translate("main", "Show progress during copy"));
+    parser.addOption(showProgressOption);
+
+    // A boolean option with multiple names (-f, --force)
+    QCommandLineOption forceOption(QStringList() << "f" << "force",
+                                   QCoreApplication::translate("main", "Overwrite existing files."));
+    parser.addOption(forceOption);
+
+    // An option with a value
+    QCommandLineOption targetDirectoryOption(QStringList() << "t" << "target-directory",
+        QCoreApplication::translate("main", "Copy all source files into <directory>."),
+        QCoreApplication::translate("main", "directory"));
+
+    parser.addOption(targetDirectoryOption);
+
+    // Process the actual command line arguments given by the user
+    parser.process(app);
+
+    const QStringList args = parser.positionalArguments();
+    // source is args.at(0), destination is args.at(1)
+    if(args.length() <= 1) {
+        parser.showHelp(1);
     }
 
-    namedWindow("MyWindow", CV_WINDOW_AUTOSIZE); //create a window with the name "MyWindow"
-    imshow("MyWindow", img); //display the image which is stored in the 'img' in the "MyWindow" window
+    bool showProgress = parser.isSet(showProgressOption);
+    bool force = parser.isSet(forceOption);
+    QString targetDir = parser.value(targetDirectoryOption);
 
-    waitKey(0); //wait infinite time for a keypress
-
-    destroyWindow("MyWindow"); //destroy the window with the name, "MyWindow"
-
-    return 0;
+    QTime time = QTime::fromString("23:59:59");
+    qDebug() << time.toString();
+    // ...
 }
