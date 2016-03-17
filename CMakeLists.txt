@@ -1,14 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
 # List of directories to search for CMake modules.
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(Toolchain-RaspberryPi)
 include(Config)
 
 project(RaspiHelloWorld)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --verbose")
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
@@ -17,21 +17,28 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 )
 
 # ┌──────────────────────────────────────────────────────────────────┐
-# │  Qt                                                              │
+# │  Boost                                                           │
 # └──────────────────────────────────────────────────────────────────┘
+# http://stackoverflow.com/questions/6646405/how-do-you-add-boost-libraries-in-cmakelists-txt
 
-set(QT5DIR "${PIROOT}/usr/lib/arm-linux-gnueabihf/qt5")
+#set(Boost_USE_STATIC_LIBS OFF)
+#set(Boost_USE_MULTITHREADED ON)
+#set(Boost_USE_STATIC_RUNTIME OFF)
 
-set(CMAKE_PREFIX_PATH ${QT5DIR} ${CMAKE_PREFIX_PATH})
-message( WARNING "CMAKE_PREFIX_PATH:       " ${CMAKE_PREFIX_PATH} )
+#set(ENV{Boost_DIR} "${PIROOT}/usr/include/boost")
+set(BOOST_ROOT ${PIROOT}/usr)
+#set(BOOST_INCLUDEDIR "${PIROOT}/usr/include")
+#set(BOOST_LIBRARYDIR "${PIROOT}/usr/lib/arm-linux-gnueabihf")
+
+set(Boost_NO_SYSTEM_PATHS ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5Core
-        PATHS "${PIROOT}/usr/lib/arm-linux-gnueabihf/cmake" ${QT5DIR}
+find_package(Boost
+        COMPONENTS program_options date_time
         REQUIRED)
-#find_package(Qt5Widgets REQUIRED)
+message( WARNING "Boost_INCLUDE_DIRS:     " ${Boost_INCLUDE_DIRS} )
+message( WARNING "Boost_LIBRARIES:     " ${Boost_LIBRARIES} )
 
 
 # Sample - findet alle SOs
@@ -43,16 +50,20 @@ find_package(Qt5Core
 
 set(SOURCE_FILES main.cpp)
 
-add_executable(RaspiHelloWorld ${SOURCE_FILES})
+add_executable(RaspiHelloWorld
+        main.cpp
+        )
 
 target_include_directories(
         RaspiHelloWorld
         PUBLIC "${PIROOT}/usr/include"
         PUBLIC "${PIROOT}/usr/include/arm-linux-gnueabihf"
+        PUBLIC "${Boost_INCLUDE_DIRS}"
 )
 
 target_link_libraries (
         RaspiHelloWorld
+        ${Boost_LIBRARIES}
 )
 
-qt5_use_modules(RaspiHelloWorld Widgets)
+

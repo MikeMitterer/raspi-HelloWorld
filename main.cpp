@@ -1,55 +1,33 @@
-#include <QApplication>
-#include <qcommandlineparser.h>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options.hpp>
 #include <iostream>
-//#include "interface/MainWindow.hpp"
-#include <QString>
-#include <QDateTime>
-#include <QDebug>
 
+namespace po = boost::program_options;
 using namespace std;
 
+// http://www.radmangames.com/programming/how-to-use-boost-program_options
+
 int main(int argc, char *argv[]) {
-    QCoreApplication app(argc, argv);
-    QCoreApplication::setApplicationName("my-copy-program");
-    QCoreApplication::setApplicationVersion("1.0");
+// Declare the supported options.
+    po::options_description desc("Allowed options");
+    desc.add_options()
+            ("help", "produce help message")
+            ("compression", po::value<int>(), "set compression level")
+            ;
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Test helper");
-    parser.addHelpOption();
-    parser.addVersionOption();
-    parser.addPositionalArgument("source", QCoreApplication::translate("main", "Source file to copy."));
-    parser.addPositionalArgument("destination", QCoreApplication::translate("main", "Destination directory."));
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
 
-    // A boolean option with a single name (-p)
-    QCommandLineOption showProgressOption("p", QCoreApplication::translate("main", "Show progress during copy"));
-    parser.addOption(showProgressOption);
-
-    // A boolean option with multiple names (-f, --force)
-    QCommandLineOption forceOption(QStringList() << "f" << "force",
-                                   QCoreApplication::translate("main", "Overwrite existing files."));
-    parser.addOption(forceOption);
-
-    // An option with a value
-    QCommandLineOption targetDirectoryOption(QStringList() << "t" << "target-directory",
-        QCoreApplication::translate("main", "Copy all source files into <directory>."),
-        QCoreApplication::translate("main", "directory"));
-
-    parser.addOption(targetDirectoryOption);
-
-    // Process the actual command line arguments given by the user
-    parser.process(app);
-
-    const QStringList args = parser.positionalArguments();
-    // source is args.at(0), destination is args.at(1)
-    if(args.length() <= 1) {
-        parser.showHelp(1);
+    if (vm.count("help")) {
+        cout << desc << "\n";
+        return 1;
     }
 
-    bool showProgress = parser.isSet(showProgressOption);
-    bool force = parser.isSet(forceOption);
-    QString targetDir = parser.value(targetDirectoryOption);
-
-    QTime time = QTime::fromString("23:59:59");
-    qDebug() << time.toString();
-    // ...
+    if (vm.count("compression")) {
+        cout << "Compression level was set to "
+        << vm["compression"].as<int>() << ".\n";
+    } else {
+        cout << "Compression level was not set.\n";
+    }
 }
