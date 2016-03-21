@@ -145,3 +145,22 @@ dseditgroup -o edit -a mikemitterer -t user nfsshare
 
 
 https://www.raspberrypi.org/documentation/remote-access/vnc/
+
+GoogleTest
+https://gist.github.com/massenz/41bb2c8375294f4d9927
+  535  cd gtest-1.7/
+  537  find . -iname "*.a"
+
+  540  cd /usr/local/lib
+  541  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest.a
+  542  ls -la libg*
+  543  ls -la libgtest*
+  544  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest_main.a
+  545  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest_main_no_exception.a
+  546  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest_main_no_rtti.a
+  547  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest_main_use_own_tuple.a
+  548  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/gtest/libgtest_no_exception.a
+  549  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/libgmock.a
+  550  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/libgmock_main.a
+  551  ls -la libg*
+
