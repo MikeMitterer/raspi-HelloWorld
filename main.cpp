@@ -1,37 +1,15 @@
-#include "Poco/BasicEvent.h"
-#include "Poco/Delegate.h"
 #include <iostream>
+#include <Poco/Util/Application.h>
 
-using Poco::BasicEvent;
-using Poco::Delegate;
+class HelloPocoApplication : public Poco::Util::Application
+{
+protected:
+    virtual int main(const std::vector<std::string> &args)
+    {
+        std::cout << "Hello, POCO C++ Libraries!!!" << std::endl;
 
-class Source {
-public:
-    BasicEvent<int> theEvent;
-
-    void fireEvent(int n) {
-        theEvent(this, n);
+        return EXIT_OK;
     }
 };
 
-class Target {
-public:
-    void onEvent(const void* pSender, int &arg) {
-        std::cout << "onEventt: " << arg << std::endl;
-    }
-};
-
-int main(int argc, char** argv) {
-    Source source;
-    Target target;
-
-    source.theEvent += Delegate<Target, int>(
-            &target, &Target::onEvent);
-
-    source.fireEvent(42);
-
-    source.theEvent -= Delegate<Target, int>(
-            &target, &Target::onEvent);
-
-    return 0;
-}
+POCO_APP_MAIN(HelloPocoApplication);

@@ -1,33 +1,35 @@
 cmake_minimum_required(VERSION 3.2)
 
 # List of directories to search for CMake modules.
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+        ${CMAKE_MODULE_PATH})
 
-include(Toolchain-RaspberryPi)
+include(Toolchain-GCC)
 include(Config)
 
 project(RaspiHelloWorld)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --verbose")
+set(CMAKE_EXE_LINKER_FLAGS "--verbose")
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
-    ${PIROOT}/lib ${PIROOT}/lib/arm-linux-gnueabihf
-    ${PIROOT}/usr/lib ${PIROOT}/usr/lib/arm-linux-gnueabihf
+        /usr/local/lib
 )
 
 # ┌──────────────────────────────────────────────────────────────────┐
 # │  Pocco                                                           │
 # └──────────────────────────────────────────────────────────────────┘
 
-set(ENV{Poco_DIR} ${PIROOT}/usr/lib)
-set(Poco_DIR ${PIROOT}/usr/lib)
+#set(ENV{Poco_DIR} ${PIROOT}/usr/lib)
+#set(Poco_DIR ${PIROOT}/usr/lib)
 
+#set(Poco_DIR /usr/local/Cellar/poco/1.7.1/lib )
 find_package(Poco
 
         )
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+#set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 message( WARNING "Poco_LIBRARIES:     " ${Poco_LIBRARIES} )
 message( WARNING "Poco_INCLUDE_DIRS:     " ${Poco_INCLUDE_DIRS} )
@@ -57,7 +59,9 @@ target_include_directories(
 target_link_libraries (
         RaspiHelloWorld
 
-        ${Poco_LIBRARIES}
+#        ${Poco_Foundation_LIBRARY}
+        ${Poco_Foundation_LIBRARY}
+        ${Poco_Util_LIBRARY}
 )
 
 
