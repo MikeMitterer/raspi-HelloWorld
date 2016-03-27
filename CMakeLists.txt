@@ -11,7 +11,6 @@ project(RaspiHelloWorld)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 #SET(GCC_COVERAGE_LINK_FLAGS    "--specs=nosys.specs")
 
-set(ROOTFS "/Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs")
 set(RASPIAN "/usr/local/linaro/arm-linux-gnueabihf-raspbian")
 set(RASPIAN_LIBC "${RASPIAN}/arm-linux-gnueabihf/libc")
 
@@ -21,11 +20,10 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 
 )
 
-find_library(WIRINGPI
-        NAMES libwiringPi libwiringPi.so
+find_library(RF24
+        NAMES librf24-bcm.so librf24-bcm.so.1
         HINTS "
-              ${ROOTFS}/lib ${ROOTFS}/lib/arm-linux-gnueabihf
-              ${ROOTFS}/usr/lib ${ROOTFS}/usr/lib/arm-linux-gnueabihf
+              ${PIROOT}/usr/local/lib
               "
 )
 message( STATUS "WIRINGPI:   " ${WIRINGPI} )
@@ -47,11 +45,12 @@ add_executable(RaspiHelloWorld ${SOURCE_FILES})
 
 target_include_directories(
         RaspiHelloWorld
-        PUBLIC ${ROOTFS}/usr/include
-        PUBLIC ${ROOTFS}/usr/include/arm-linux-gnueabihf
+        PUBLIC ${PIROOT}/usr/local/include
+        PUBLIC ${PIROOT}/usr/include
+        PUBLIC ${PIROOT}/usr/include/arm-linux-gnueabihf
 )
 
 target_link_libraries (
         RaspiHelloWorld
-        ${WIRINGPI}
+        ${RF24}
 )
