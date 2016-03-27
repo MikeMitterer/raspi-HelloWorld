@@ -20,6 +20,13 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 
 )
 
+find_library(WIRINGPI
+        NAMES libwiringPi libwiringPi.so
+        HINTS "
+              ${PIROOT}/usr/lib
+              "
+        )
+
 find_library(RF24
         NAMES librf24-bcm.so librf24-bcm.so.1
         HINTS "
@@ -47,10 +54,10 @@ target_include_directories(
         RaspiHelloWorld
         PUBLIC ${PIROOT}/usr/local/include
         PUBLIC ${PIROOT}/usr/include
-        PUBLIC ${PIROOT}/usr/include/arm-linux-gnueabihf
 )
 
 target_link_libraries (
         RaspiHelloWorld
         ${RF24}
+#        ${WIRINGPI}
 )

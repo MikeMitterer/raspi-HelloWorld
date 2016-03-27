@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+//#include <wiringPi.h>
 #include <RF24/RF24.h>
 
 using namespace std;
@@ -19,7 +20,7 @@ int main(int argc, char** argv)
     // Refer to RF24.h or nRF24L01 DS for settings
     radio.begin();
     //radio.enableDynamicPayloads();
-    //radio.setPALevel(RF24_PA_MAX);
+    //radio.setPALevel(RF24_PA_LOW);
     radio.setRetries(15,15);
     radio.setDataRate(RF24_250KBPS);
     radio.setPayloadSize(8);
@@ -44,42 +45,57 @@ int main(int argc, char** argv)
     printf("Output below : \n");
     delay(1);
 
+    // Pin 27 muss exportiert sein (gpio export 27 out)
+//    int pin = 27;
+
+    // http://wiringpi.com/reference/setup/
+    // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
+//    if (wiringPiSetupSys() == -1) {
+//        exit (1);
+//    }
+//    pinMode(pin, OUTPUT);
+//
+//    delay(1);
+
+    int counter{0};
+
     while(1)
     {
-        char receivePayload[32];
+        int16_t receivePayload = 0;
         uint8_t pipe = 1;
 
         // Start listening
-        radio.startListening();
 
-        while ( radio.available(&pipe) )
-        {
-            len = radio.getDynamicPayloadSize();
-            radio.read( receivePayload, len );
 
-            // Display it on screen
-            printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,pipe);
-
-            // Send back payload to sender
-            radio.stopListening();
-
-            // if pipe is 7, do not send it back
-            if ( pipe != 7 )
+        if(radio.available()) {
+            while ( radio.available() )
             {
-                radio.write(receivePayload,len);
-                receivePayload[len]=0;
-                printf("\t Send: size=%i payload=%s pipe:%i\n",len,receivePayload,pipe);
-            }
-            else
-            {
-                printf("\n");
+                //len = radio.getDynamicPayloadSize();
+                len = 2;
+                radio.read( &receivePayload, sizeof(receivePayload));
+                delay(20);
+
+//            if(receivePayload == 111) {
+                printf("Recv: size=%i payload=%d pipe=%i counter=%d",len,receivePayload,1,counter);
+//            }
+                // Display it on screen
+//            printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,1);
+//            digitalWrite(pin, 1);
+//            delay(250);
+//            digitalWrite(pin, 0);
+
+                // Send back payload to sender
+                radio.stopListening();
+
+                // if pipe is 7, do not send it back
+                radio.write(&receivePayload,len);
+                receivePayload = 0;
+                printf("\t Send: size=%i payload=%d pipe:%i\n",len,receivePayload,0);
+
+                radio.startListening();
+                counter++;
             }
 
-            pipe++;
-
-            // reset pipe to 0
-            if ( pipe > 1 )
-                pipe = 0;
         }
 
         delayMicroseconds(20);
