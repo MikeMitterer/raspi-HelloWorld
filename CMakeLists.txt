@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# List of directories to search for CMake modules.
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(Toolchain-RaspberryPi)
 include(Config)
 
 project(RaspiHelloWorld)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 #SET(GCC_COVERAGE_LINK_FLAGS    "--specs=nosys.specs")
 
 set(ROOTFS "/Volumes/Daten/DevLocal/DevCPP/raspberry/rootfs")
@@ -29,16 +30,16 @@ find_library(WIRINGPI
 )
 message( STATUS "WIRINGPI:   " ${WIRINGPI} )
 
-find_library(PTHREAD
-        NAMES libpthread libpthread.so libpthread.so.0
-        HINTS "
-              ${RASPIAN_LIBC}
-              "
-)
-if(NOT ${PTHREAD})
-    set(PTHREAD "${RASPIAN_LIBC}/usr/lib/arm-linux-gnueabihf/libpthread.so")
-endif()
-message( STATUS "PTHREAD:    " ${PTHREAD} )
+#find_library(PTHREAD
+#        NAMES libpthread libpthread.so libpthread.so.0
+#        HINTS "
+#              ${RASPIAN_LIBC}
+#              "
+#)
+#if(NOT ${PTHREAD})
+#    set(PTHREAD "${RASPIAN_LIBC}/usr/lib/arm-linux-gnueabihf/libpthread.so")
+#endif()
+#message( STATUS "PTHREAD:    " ${PTHREAD} )
 
 set(SOURCE_FILES main.cpp)
 
@@ -52,5 +53,5 @@ target_include_directories(
 
 target_link_libraries (
         RaspiHelloWorld
-        ${PTHREAD} ${WIRINGPI}
+        ${WIRINGPI}
 )

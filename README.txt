@@ -99,3 +99,7 @@ https://projects.drogon.net/raspberry-pi/wiringpi/the-gpio-utility/
 
 RemoteDebugging
     https://sourceware.org/gdb/wiki/BuildingCrossGDBandGDBserver
+
+QT5
+        LDFLAGS:  -L/usr/local/opt/qt5/lib
+        CPPFLAGS: -I/usr/local/opt/qt5/include

@@ -32,7 +32,7 @@ message (STATUS "Architecture is 64Bit - ${X64}")
 # └──────────────────────────────────────────────────────────────────┘
 
 # Mac needed variables (adapt according to your needs)
-set(CMAKE_MACOSX_RPATH ON)
+#set(CMAKE_MACOSX_RPATH ON)
 #set(CMAKE_SKIP_BUILD_RPATH FALSE)
 #set(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 #set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
