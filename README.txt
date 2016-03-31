@@ -108,8 +108,5 @@ SPI non ROOT access
      https://github.com/TMRh20/RF24/issues/234
      http://tmrh20.github.io/RF24/RPi.html
 
-RF24 - alternativ-Lib
-    https://github.com/gnulnulf/RF24
-
-    ODER
-        https://github.com/stanleyseow/RF24.git
+RF24 - LIB (Arduino + RASPI)
+    http://platformio.org/lib/show/433/RF24

@@ -56,14 +56,14 @@ int main(int argc, char** argv)
     printf("Output below : \n");
 
     // Pin 27 muss exportiert sein (gpio export 27 out)
-//    int pin = 27;
+    int pin = 27;
 
     // http://wiringpi.com/reference/setup/
     // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
 //    if (wiringPiSetupSys() == -1) {
 //        exit (1);
 //    }
-//    pinMode(pin, OUTPUT);
+    pinMode(pin, OUTPUT);
 //
     delay(50);
 
@@ -82,14 +82,12 @@ int main(int argc, char** argv)
                 radio.read( &receivePayload, sizeof(receivePayload));
                 delay(20);
 
-//            if(receivePayload == 111) {
                 printf("Recv: size=%i payload=%d pipe=%i",len,receivePayload,1);
-//            }
-                // Display it on screen
-//            printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,1);
-//            digitalWrite(pin, 1);
-//            delay(250);
-//            digitalWrite(pin, 0);
+            if(receivePayload == 111) {
+                digitalWrite(pin, 1);
+                delay(250);
+                digitalWrite(pin, 0);
+            }
 
                 // Send back payload to sender
                 radio.stopListening();
