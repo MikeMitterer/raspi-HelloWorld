@@ -10,8 +10,11 @@ const uint64_t pipes[2] = { 0xF0F0F0F0E1LL, 0xF0F0F0F0D2LL };
 
 // CE Pin, CSN Pin, SPI Speed
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 250KBPS
-RF24 radio(RPI_V2_GPIO_P1_22, 0, RF24_250KBPS);
+RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, RF24_250KBPS);
 
+// 0 - write to pipe 0, read from pipe 1
+// 1 - write to pipe 1, read from pipe 0
+const int role = 0;
 
 int main(int argc, char** argv)
 {
@@ -20,22 +23,30 @@ int main(int argc, char** argv)
     // Refer to RF24.h or nRF24L01 DS for settings
     radio.begin();
     //radio.enableDynamicPayloads();
-    //radio.setPALevel(RF24_PA_LOW);
+    radio.setPALevel(RF24_PA_HIGH);
     radio.setRetries(15,15);
     radio.setDataRate(RF24_250KBPS);
     radio.setPayloadSize(8);
-    //radio.setAutoAck(1);
+    radio.setAutoAck(1);
     radio.setChannel(13);
     //radio.setCRCLength(RF24_CRC_16);
 
-    // Open 6 pipes for readings ( 5 plus pipe0, also can be used for reading )
-    radio.openWritingPipe(pipes[0]);
-    radio.openReadingPipe(1,pipes[1]);
+    if (role == 0) {
+        radio.openWritingPipe(pipes[0]);
+        radio.openReadingPipe(1, pipes[1]);
+    }
+    else {
+        radio.openWritingPipe(pipes[1]);
+        radio.openReadingPipe(1, pipes[0]);
+    }
+    delay(50);
 
     //
     // Start listening
     //
     radio.startListening();
+
+    delay(50);
 
     //
     // Dump the configuration of the rf unit for debugging
@@ -43,7 +54,6 @@ int main(int argc, char** argv)
     radio.printDetails();
 
     printf("Output below : \n");
-    delay(1);
 
     // Pin 27 muss exportiert sein (gpio export 27 out)
 //    int pin = 27;
@@ -55,17 +65,14 @@ int main(int argc, char** argv)
 //    }
 //    pinMode(pin, OUTPUT);
 //
-//    delay(1);
+    delay(50);
 
-    int counter{0};
+    radio.startListening();
 
     while(1)
     {
         int16_t receivePayload = 0;
-        uint8_t pipe = 1;
-
         // Start listening
-
 
         if(radio.available()) {
             while ( radio.available() )
@@ -76,7 +83,7 @@ int main(int argc, char** argv)
                 delay(20);
 
 //            if(receivePayload == 111) {
-                printf("Recv: size=%i payload=%d pipe=%i counter=%d",len,receivePayload,1,counter);
+                printf("Recv: size=%i payload=%d pipe=%i",len,receivePayload,1);
 //            }
                 // Display it on screen
 //            printf("Recv: size=%i payload=%s pipe=%i",len,receivePayload,1);
@@ -89,16 +96,16 @@ int main(int argc, char** argv)
 
                 // if pipe is 7, do not send it back
                 radio.write(&receivePayload,len);
-                receivePayload = 0;
                 printf("\t Send: size=%i payload=%d pipe:%i\n",len,receivePayload,0);
+                receivePayload = 0;
 
                 radio.startListening();
-                counter++;
             }
 
         }
 
-        delayMicroseconds(20);
+        //delayMicroseconds(20);
+        delay(500);
     }
 
     return 0;
