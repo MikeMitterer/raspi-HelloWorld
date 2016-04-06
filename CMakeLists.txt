@@ -9,6 +9,7 @@ include(Config)
 project(RaspiHelloWorld)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
+# -mfpu=vfp -mfloat-abi=hard
 #SET(GCC_COVERAGE_LINK_FLAGS    "--specs=nosys.specs")
 
 set(RASPIAN "/usr/local/linaro/arm-linux-gnueabihf-raspbian")
