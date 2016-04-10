@@ -15,6 +15,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 set(RASPIAN "/usr/local/linaro/arm-linux-gnueabihf-raspbian")
 set(RASPIAN_LIBC "${RASPIAN}/arm-linux-gnueabihf/libc")
 
+set(SHARED_FOLDER  "_shared")
+
 message( STATUS "MYROOTFS:   " ${ROOTFS} )
 
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
@@ -47,12 +49,16 @@ message( STATUS "WIRINGPI:   " ${WIRINGPI} )
 #endif()
 #message( STATUS "PTHREAD:    " ${PTHREAD} )
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES
+    main.cpp
+    ${SHARED_FOLDER}/rf24/rf24.cpp
+)
 
 add_executable(RaspiHelloWorld ${SOURCE_FILES})
 
 target_include_directories(
         RaspiHelloWorld
+        PUBLIC ${SHARED_FOLDER}/rf24
         PUBLIC ${PIROOT}/usr/local/include
         PUBLIC ${PIROOT}/usr/include
 )
