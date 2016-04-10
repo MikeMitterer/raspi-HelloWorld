@@ -10,9 +10,9 @@ using namespace std;
 // Only the least significant byte should be unique.
 // You drop the 0x and LL.
 // As stated the 0x indicates the value is a hex value and LL means type Long Long
-const uint64_t pipes[3] = {0xF0F0F0F0E1LL,
-                           0xF0F0F0F0D2LL,
-                           0xF0F0F0F0F3LL
+const uint64_t pipes[3] = {0xF0F0F0F0D1LL, // Server
+                           0xF0F0F0F0E1LL, // Client 1
+                           0xF0F0F0F0F1LL // Client2
 };
 
 // CE Pin, CSN Pin, SPI Speed
@@ -31,14 +31,28 @@ struct MsgToSend {
 int main(int argc, char** argv) {
     // Refer to RF24.h or nRF24L01 DS for settings
     radio.begin();
+
     //radio.enableDynamicPayloads();
     radio.setPALevel(RF24_PA_HIGH);
+    // optionally, increase the delay between retries & # of retries
     radio.setRetries(15, 15);
-    radio.setDataRate(RF24_250KBPS);
+
+    // default auf 1
+    // radio.setAutoAck(1);
+
+    // optionally, reduce the payload size.  seems to
+    // improve reliability (8)
     radio.setPayloadSize(sizeof(MsgToSend));
-    radio.setAutoAck(1);
+    //radio.enableDynamicPayloads();
+
+    radio.setDataRate(RF24_250KBPS); // reducing bandwidth
+
+    // 2.508 Ghz - Above most Wifi Channels
     radio.setChannel(13);
     //radio.setCRCLength(RF24_CRC_16);
+
+    //radio.setCRCLength(RF24_CRC_16);
+    delay(50);
 
     if (role == 0) {
         radio.openWritingPipe(pipes[0]);
@@ -76,7 +90,6 @@ int main(int argc, char** argv) {
 //
     delay(50);
 
-    radio.startListening();
     uint16_t dataCounter{};
 
     while (1) {
@@ -91,7 +104,7 @@ int main(int argc, char** argv) {
                 radio.read(&dataReceived, len);
                 delay(20);
 
-                printf("(%5i) Recv: size=%i Data=%i pipe=%i",dataCounter, len, dataReceived.data, dataReceived.id);
+                printf("(%5i) Recv: size=%i Data=%i pipe=%i\n",dataCounter, len, dataReceived.data, dataReceived.id);
 
                 if (dataReceived.data == 111) {
                     digitalWrite(pin, 1);
@@ -99,15 +112,15 @@ int main(int argc, char** argv) {
                     digitalWrite(pin, 0);
                 }
 
-                // Send back payload to sender
-                radio.stopListening();
-
-                // if pipe is 7, do not send it back
-                radio.write(&dataReceived, len);
-                printf("\t Send: size=%i Data=%i pipe:%i\n", len, dataReceived.data, dataReceived.id);
-                dataReceived.data = 0;
-
-                radio.startListening();
+//                // Send back payload to sender
+//                radio.stopListening();
+//
+//                // if pipe is 7, do not send it back
+//                radio.write(&dataReceived, len);
+//                printf("\t Send: size=%i Data=%i pipe:%i\n", len, dataReceived.data, dataReceived.id);
+//                dataReceived.data = 0;
+//
+//                radio.startListening();
 
                 dataCounter++;
             }
