@@ -52,6 +52,7 @@ message( STATUS "WIRINGPI:   " ${WIRINGPI} )
 set(SOURCE_FILES
     main.cpp
     ${SHARED_FOLDER}/rf24/rf24.cpp
+    ${SHARED_FOLDER}/rf24/ReadingPipe.hpp
 )
 
 add_executable(RaspiHelloWorld ${SOURCE_FILES})

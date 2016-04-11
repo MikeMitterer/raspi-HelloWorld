@@ -11,22 +11,25 @@ RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, RF24_250KBPS);
 
 const Role role = Role::Server;
 
-RF24Client client1(radio, pipe1,pipeWrite1);
-RF24Client client2(radio, pipe2,pipeWrite2);
+// Initialisierung der Clients funkt nur wenn
+// die Adressen der Pipes in ReadingPipe.hpp definiert sind!
+RF24Client client1(radio, pipe1, pipeWrite1);
+RF24Client client2(radio, pipe2, pipeWrite2);
 
 int main(int argc, char** argv) {
-
     // Refer to RF24.h or nRF24L01 DS for settings
     radio.begin();
     setupRadio(radio);
+    resetReadingPipes(radio);
     delay(50);
 
     client1.enableReading();
     client2.enableReading();
+    //radio.openReadingPipe(2, pipe2.getAddress());
 
     delay(50);
 
-    radio.openWritingPipe(pipeServer.getAddress());
+    //radio.openWritingPipe(pipeServer.getAddress());
     delay(50);
 
     // Pin 27 muss exportiert sein (gpio export 27 out)
@@ -64,18 +67,19 @@ int main(int argc, char** argv) {
                     delay(250);
                     digitalWrite(pin, 0);
 
-//                    radio.openWritingPipe(pipeServer.getAddress());
-//                    delay(50);
-//
-//                    radio.stopListening();
-//                    const bool result = radio.write(&dataReceived,len);
-//                    radio.startListening();
-//
-//                    if(result == true) {
-//                        printf("%i bytes written to client 1!\n",len);
-//                    } else {
-//                        printf("Could not write to Client 1\n");
-//                    }
+                    client1.enableWriting();
+                    //radio.openWritingPipe(pipeServer.getAddress());
+                    delay(50);
+
+                    radio.stopListening();
+                    const bool result = radio.write(&dataReceived,len);
+                    radio.startListening();
+
+                    if(result == true) {
+                        printf("%i bytes written to client 1!\n",len);
+                    } else {
+                        printf("Could not write to Client 1\n");
+                    }
 
                 }
 
