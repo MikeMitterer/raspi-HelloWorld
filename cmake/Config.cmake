@@ -3,9 +3,10 @@
 # └──────────────────────────────────────────────────────────────────┘
 
 # C++11:
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
 # C++14:
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
 add_compile_options("-Wall")
 # add_compile_options("-Wextra")

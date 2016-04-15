@@ -11,12 +11,14 @@ RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, RF24_250KBPS);
 
 const Role role = Role::Server;
 
-// Initialisierung der Clients funkt nur wenn
-// die Adressen der Pipes in ReadingPipe.hpp definiert sind!
-RF24Client client1(radio, pipe1, pipeWrite1);
-RF24Client client2(radio, pipe2, pipeWrite2);
+
 
 int main(int argc, char** argv) {
+// Initialisierung der Clients funkt nur wenn
+// die Adressen der Pipes in ReadingPipe.hpp definiert sind!
+    RF24Client client1(radio, channel1);
+//    RF24Client client2(radio, readPipe2, pipeWrite2);
+
     // Refer to RF24.h or nRF24L01 DS for settings
     radio.begin();
     setupRadio(radio);
@@ -24,8 +26,8 @@ int main(int argc, char** argv) {
     delay(50);
 
     client1.enableReading();
-    client2.enableReading();
-    //radio.openReadingPipe(2, pipe2.getAddress());
+//    client2.enableReading();
+    //radio.openReadingPipe(channel1.getNumber(), channel1.getInAddress());
 
     delay(50);
 
@@ -68,7 +70,7 @@ int main(int argc, char** argv) {
                     digitalWrite(pin, 0);
 
                     client1.enableWriting();
-                    //radio.openWritingPipe(pipeServer.getAddress());
+                    //radio.openWritingPipe(channel1.getOutAddress());
                     delay(50);
 
                     radio.stopListening();
