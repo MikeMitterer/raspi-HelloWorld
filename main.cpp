@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
 // Initialisierung der Clients funkt nur wenn
 // die Adressen der Pipes in ReadingPipe.hpp definiert sind!
     RF24Client client1(radio, channel1);
+    RF24Client client2(radio, channel2);
 //    RF24Client client2(radio, readPipe2, pipeWrite2);
 
     // Refer to RF24.h or nRF24L01 DS for settings
@@ -26,7 +27,7 @@ int main(int argc, char** argv) {
     delay(50);
 
     client1.enableReading();
-//    client2.enableReading();
+    client2.enableReading();
     //radio.openReadingPipe(channel1.getNumber(), channel1.getInAddress());
 
     delay(50);
@@ -64,12 +65,19 @@ int main(int argc, char** argv) {
                 printf("(%5i) Recv: size=%i Data=%i pipe=%i\n",
                        dataCounter, len, dataReceived.data, dataReceived.id);
 
-                if (dataReceived.data == 111) {
+                if (dataReceived.data < 1000) {
                     digitalWrite(pin, 1);
                     delay(250);
                     digitalWrite(pin, 0);
 
-                    client1.enableWriting();
+                    uint8_t clientID = 99;
+                    if(dataReceived.id == 1) {
+                        client1.enableWriting();
+                        clientID = 1;
+                    } else {
+                        client2.enableWriting();
+                        clientID = 2;
+                    }
                     //radio.openWritingPipe(channel1.getOutAddress());
                     delay(50);
 
@@ -78,9 +86,9 @@ int main(int argc, char** argv) {
                     radio.startListening();
 
                     if(result == true) {
-                        printf("%i bytes written to client 1!\n",len);
+                        printf("%i bytes written to client %i!\n",len,clientID);
                     } else {
-                        printf("Could not write to Client 1\n");
+                        printf("Could not write to Client %i\n",clientID);
                     }
 
                 }
