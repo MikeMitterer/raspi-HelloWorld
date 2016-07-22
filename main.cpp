@@ -21,17 +21,15 @@ uint8_t digitalRead(const uint8_t pin) { return bcm2835_gpio_lev(pin); }
 
 int main(int argc, char** argv) {
 
-
-    // http://wiringpi.com/reference/setup/
-    // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
-//    if (wiring::wiringPiSetupSys() == -1) {
-//        printf("wiringPi initialisation failed\n");
-//        exit(1);
-//    }
-//    printf("wiringPi up and running...\n");
+    if(!bcm2835_init()) {
+        printf("GPIO initialization failed!\n");
+        return 1;
+    }
+    printf("RASPI is up and running\n");
 
     // Pin 18 / GPIO 24 muss exportiert sein (gpio export 24 in)
     uint8_t gpioButton = 24;
+    bcm2835_gpio_fsel(gpioButton, BCM2835_GPIO_FSEL_INPT);
     //pinMode(gpioButton, BCM2835_GPIO_FSEL_INPT);
     //wiring::pinMode(gpioButton, INPUT);
 
@@ -143,5 +141,6 @@ int main(int argc, char** argv) {
         delay(500);
     }
 
+    bcm2835_close();
     return 0;
 }
