@@ -1,12 +1,12 @@
 #include <cstdlib>
 #include <iostream>
 
-//namespace wiring{
-//    #include "wiringPi.h"
-//}
-
 #include <rf24.hpp>
-//#include <errno.h>
+#include "pigpio.h"
+
+namespace wiring{
+    #include "wiringPi.h"
+}
 
 using namespace std;
 
@@ -16,24 +16,17 @@ RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, RF24_250KBPS);
 
 const Role role = Role::Server;
 
-//const int INPUT = BCM2835_GPIO_FSEL_INPT;
-uint8_t digitalRead(const uint8_t pin) { return bcm2835_gpio_lev(pin); }
-
 int main(int argc, char** argv) {
 
-
-    // http://wiringpi.com/reference/setup/
-    // wiringPiSetupSys uses Broadcom GPIO pin numbers directly with no re-mapping
-//    if (wiring::wiringPiSetupSys() == -1) {
-//        printf("wiringPi initialisation failed\n");
-//        exit(1);
-//    }
-//    printf("wiringPi up and running...\n");
+    if (wiring::wiringPiSetup () == -1) {
+        printf("wiringPiSetup failed!");
+        exit(1);
+    }
+    printf("WiringPI setup - OK!\n");
 
     // Pin 18 / GPIO 24 muss exportiert sein (gpio export 24 in)
-    uint8_t gpioButton = 24;
-    //pinMode(gpioButton, BCM2835_GPIO_FSEL_INPT);
-    //wiring::pinMode(gpioButton, INPUT);
+    int gpioButton = 24;
+    wiring::pinMode(gpioButton, INPUT);
 
     // Initialisierung der Clients funkt nur wenn
     // die Adressen der Pipes in ReadingPipe.hpp definiert sind!
@@ -72,13 +65,12 @@ int main(int argc, char** argv) {
     uint16_t dataCounter{};
 
     int counter = 0;
-    uint8_t btnState = 0;
     while (counter < 5) {
         // Start listening
 
-        if (digitalRead(gpioButton) == LOW) {
-            delay(50);
-            if (digitalRead(gpioButton) == LOW) {
+        if (wiring::digitalRead(gpioButton) == 0) {
+            wiring::delay(50);
+            if (wiring::digitalRead(gpioButton) == 0) {
                 printf("Button pressed!\n");
                 counter++;
             }
