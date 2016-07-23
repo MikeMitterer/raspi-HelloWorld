@@ -25,12 +25,16 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 
 )
 
-find_library(WIRINGPI
-        NAMES libwiringPi libwiringPi.so
-        HINTS "
-              ${PIROOT}/usr/lib
-              "
-        )
+
+# Bei der Aktivierung muss auch der Teil in target_link_libraries
+# wieder aktiviert werden!
+#
+# find_library(WIRINGPI
+#        NAMES libwiringPi libwiringPi.so
+#        HINTS "
+#              ${PIROOT}/usr/lib
+#              "
+#        )
 
 find_library(RF24
         NAMES librf24-bcm.so librf24-bcm.so.1
@@ -54,6 +58,7 @@ message( STATUS "PIROOT:     " ${PIROOT} )
 
 set(SOURCE_FILES
         main.cpp
+        include/GPIO.h
         ${SHARED_FOLDER}/rf24/rf24.cpp
         ${SHARED_FOLDER}/rf24/ReadingPipe.hpp
         )
@@ -77,5 +82,5 @@ target_include_directories(
 target_link_libraries (
         RaspiHelloWorld
         ${RF24}
-        ${WIRINGPI}
+        # ${WIRINGPI}
 )

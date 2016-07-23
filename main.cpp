@@ -1,14 +1,11 @@
 #include <cstdlib>
 #include <iostream>
 
-//namespace wiring{
-//    #include "wiringPi.h"
-//}
-
 #include <rf24.hpp>
-//#include <errno.h>
+#include "GPIO.h"
 
 using namespace std;
+using namespace mm;
 
 // CE Pin, CSN Pin, SPI Speed
 // Setup for GPIO 22 CE and CE0 CSN with SPI Speed @ 250KBPS
@@ -16,20 +13,32 @@ RF24 radio(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24, RF24_250KBPS);
 
 const Role role = Role::Server;
 
-//const int INPUT = BCM2835_GPIO_FSEL_INPT;
-uint8_t digitalRead(const uint8_t pin) { return bcm2835_gpio_lev(pin); }
+//- Test ----------------
+
+gpio::Board board;
+
+// - States --
+
+enum class State {
+    Idle,
+    LedOn, LedOff,
+    Exit
+};
 
 int main(int argc, char** argv) {
 
-    if(!bcm2835_init()) {
+
+    if(!board.init()) {
         printf("GPIO initialization failed!\n");
-        return 1;
     }
     printf("RASPI is up and running\n");
 
     // Pin 18 / GPIO 24 muss exportiert sein (gpio export 24 in)
-    uint8_t gpioButton = 24;
-    bcm2835_gpio_fsel(gpioButton, BCM2835_GPIO_FSEL_INPT);
+    gpio::Pin pinButton(24);
+
+    // uint8_t gpioButton = 24;
+    // bcm2835_gpio_fsel(gpioButton, BCM2835_GPIO_FSEL_INPT);
+
     //pinMode(gpioButton, BCM2835_GPIO_FSEL_INPT);
     //wiring::pinMode(gpioButton, INPUT);
 
@@ -54,9 +63,13 @@ int main(int argc, char** argv) {
     //radio.openWritingPipe(pipeServer.getAddress());
     delay(50);
 
-    // Pin 27 muss exportiert sein (gpio export 27 out)
-    int pin = 27;
-    pinMode(pin, OUTPUT);
+    // Pin 13 / GPIO 27 muss exportiert sein (gpio export 27 out)
+    //int pin = 27;
+    //pinMode(pin, OUTPUT);
+    gpio::Pin pinLed(27,[] (gpio::Pin& pin) {
+        pin.write(gpio::Pin::OutputState::OFF);
+        printf("Turned off LED with Lambda-Function!\n");
+    });
 
     //
     // Dump the configuration of the rf unit for debugging
@@ -70,16 +83,43 @@ int main(int argc, char** argv) {
     uint16_t dataCounter{};
 
     int counter = 0;
-    uint8_t btnState = 0;
-    while (counter < 5) {
-        // Start listening
+    State state = State::Idle;
 
-        if (digitalRead(gpioButton) == LOW) {
+    // Start listening
+    while (state != State::Exit && counter < 10) {
+
+
+
+        //printf("STate %d\n",bcm2835_gpio_lev(24));
+
+        if (pinButton.read() == gpio::Pin::InputState::LOW) {
             delay(50);
-            if (digitalRead(gpioButton) == LOW) {
+            if (pinButton.read() == gpio::Pin::InputState::LOW) {
+                state = State::LedOn;
+
                 printf("Button pressed!\n");
+//                pinLed.write(gpio::Pin::OutputState::ON);
+//                delay(250);
+//                pinLed.write(gpio::Pin::OutputState::OFF);
                 counter++;
             }
+        }
+
+        switch (state) {
+            case State::LedOn :
+                pinLed.write(gpio::Pin::OutputState::ON);
+                delay(100);
+                state = State::LedOff;
+                break;
+
+            case State::LedOff :
+                pinLed.write(gpio::Pin::OutputState::OFF);
+                state = State::Idle;
+                break;
+
+            case State::Idle :
+                delay(50);
+                break;
         }
 
         if (radio.available()) {
@@ -95,9 +135,9 @@ int main(int argc, char** argv) {
                        dataCounter, len, dataReceived.data, dataReceived.id);
 
                 if (dataReceived.data < 1000) {
-                    digitalWrite(pin, 1);
-                    delay(250);
-                    digitalWrite(pin, 0);
+//                    digitalWrite(pin, 1);
+//                    delay(250);
+//                    digitalWrite(pin, 0);
 
                     uint8_t clientID = 99;
                     if(dataReceived.id == 1) {
@@ -138,9 +178,8 @@ int main(int argc, char** argv) {
         }
 
         //delayMicroseconds(20);
-        delay(500);
+        //delay(500);
     }
 
-    bcm2835_close();
     return 0;
 }

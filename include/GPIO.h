@@ -5,28 +5,14 @@
 #ifndef RASPIHELLOWORLD_GPIO_H
 #define RASPIHELLOWORLD_GPIO_H
 
-/*
- * https://github.com/mrshu/GPIOlib
- * Copyright (c) 2011, Copyright (c) 2011 mr.Shu
- * All rights reserved.
- *
- * Modified on 24 June 2012, 11:06 AM
- * File:   gpio.h
- * Author: purinda (purinda@gmail.com)
- *
- */
+#include <RF24/nRF24L01.h>
+#include <RF24/RF24.h>
+#include <functional>
 
-#ifndef H
-#define	H
-
-#include <cstdio>
-
-/**
- * @file gpio.h
- * \cond HIDDEN_SYMBOLS
- * Class declaration for GPIO helper files
- */
-
+/*! was 1 - This means pin HIGH, true, 3.3volts on a pin. */
+#undef HIGH
+/*! was 0 - This means pin LOW, false, 0volts on a pin. */
+#undef LOW
 
 /**
  * Example GPIO.h file
@@ -37,53 +23,93 @@
  * @{
  */
 
+namespace mm {
 
-class GPIO {
-public:
+    namespace gpio {
 
-    /* Constants */
-    static const int DIRECTION_OUT = 1;
-    static const int DIRECTION_IN = 0;
+        class Board {
+        private:
+            bool initialized = false;
 
-    static const int OUTPUT_HIGH = 1;
-    static const int OUTPUT_LOW = 0;
+        public:
 
-    GPIO();
+            /// Necessary!!!!
+            /// Returns true if it succeeds - otherwaise it returns false
+            bool init() {
+                if(!initialized) {
+                    initialized = bcm2835_init() == 1;
+                }
+                return  initialized;
+            }
 
-    /**
-     * Similar to Arduino pinMode(pin,mode);
-     * @param port
-     * @param DDR
-     */
-    static void open(int port, int DDR);
-    /**
-     *
-     * @param port
-     */
-    static void close(int port);
-    /**
-     * Similar to Arduino digitalRead(pin);
-     * @param port
-     * @param value
-     */
-    static int read(int port);
-    /**
-    * Similar to Arduino digitalWrite(pin,state);
-    * @param port
-    * @param value
-    */
-    static void write(int port,int value);
+        ~Board() {
+            bcm2835_close();
+        }
 
-    virtual ~GPIO();
+        private:
 
-private:
+        };
 
-};
-/**
- * \endcond
- */
-/*@}*/
-#endif	/* H */
+        class Pin {
+        public:
+            enum class Direction {
+                INPUT, OUTPUT, UNDEFINED
+            };
 
+            enum class InputState {
+                /*! This means pin HIGH, true, 3.3volts on a pin. */
+                        HIGH,
+                /*! This means pin LOW, false, 0volts on a pin. */
+                        LOW
+            };
+
+            enum class OutputState { ON, OFF};
+
+        private:
+            const uint8_t pin;
+            Direction direction = Direction::UNDEFINED;
+            std::function<void (Pin& pin)> closing = [] (Pin& pin) { printf("Closing function!\n"); };
+
+        public:
+
+            Pin(const uint8_t pinParam) : pin{pinParam} {
+            }
+
+            Pin(const uint8_t pinParam,std::function<void (Pin& pin)> closing) : pin{pinParam} {
+                mode(direction);
+                this->closing = closing;
+            }
+
+            ~Pin() {
+                closing(*this);
+            }
+
+            const Direction& mode(const Direction& direction) {
+                if(direction == Direction::INPUT) {
+                    bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_INPT);
+                } else {
+                    bcm2835_gpio_fsel(pin, BCM2835_GPIO_FSEL_OUTP);
+                }
+                this->direction = direction;
+                return this->direction;
+            }
+
+            InputState read() {
+                if(direction != Direction::INPUT) {
+                    direction = mode(Direction::INPUT);
+                }
+                return bcm2835_gpio_lev(pin) == 0 ? InputState::LOW : InputState::HIGH;
+            }
+
+            void write(const OutputState state) {
+                if(direction != Direction::OUTPUT) {
+                    direction = mode(Direction::OUTPUT);
+                }
+                bcm2835_gpio_write(pin, (uint8_t) (state == OutputState::ON ? 1 : 0));
+            }
+        };
+    }
+
+}
 
 #endif //RASPIHELLOWORLD_GPIO_H
