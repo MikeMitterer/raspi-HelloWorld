@@ -22,13 +22,18 @@ gpio::Board board;
 enum class State {
     Idle,
     LedOn, LedOff,
+    LedClientOn,
+    Radio,
     Exit
 };
 
-int main(int argc, char** argv) {
+void fetchData();
+void sendData(RF24& radio, RF24Client& client);
+
+int main(int argc, char **argv) {
 
 
-    if(!board.init()) {
+    if (!board.init()) {
         printf("GPIO initialization failed!\n");
     }
     printf("RASPI is up and running\n");
@@ -66,7 +71,7 @@ int main(int argc, char** argv) {
     // Pin 13 / GPIO 27 muss exportiert sein (gpio export 27 out)
     //int pin = 27;
     //pinMode(pin, OUTPUT);
-    gpio::Pin pinLed(27,[] (gpio::Pin& pin) {
+    gpio::Pin pinLed(27, [](gpio::Pin &pin) {
         pin.write(gpio::Pin::OutputState::OFF);
         printf("Turned off LED with Lambda-Function!\n");
     });
@@ -86,9 +91,7 @@ int main(int argc, char** argv) {
     State state = State::Idle;
 
     // Start listening
-    while (state != State::Exit && counter < 10) {
-
-
+    while (state != State::Exit && counter < 50) {
 
         //printf("STate %d\n",bcm2835_gpio_lev(24));
 
@@ -98,11 +101,12 @@ int main(int argc, char** argv) {
                 state = State::LedOn;
 
                 printf("Button pressed!\n");
-//                pinLed.write(gpio::Pin::OutputState::ON);
-//                delay(250);
-//                pinLed.write(gpio::Pin::OutputState::OFF);
                 counter++;
             }
+        }
+
+        if (radio.available()) {
+            state = State::Radio;
         }
 
         switch (state) {
@@ -114,6 +118,16 @@ int main(int argc, char** argv) {
 
             case State::LedOff :
                 pinLed.write(gpio::Pin::OutputState::OFF);
+                state = State::LedClientOn;
+                break;
+
+            case State::LedClientOn :
+                sendData(radio,client1);
+                state = State::Idle;
+                break;
+
+            case State::Radio :
+                fetchData();
                 state = State::Idle;
                 break;
 
@@ -122,45 +136,70 @@ int main(int argc, char** argv) {
                 break;
         }
 
-        if (radio.available()) {
-            MsgToSend dataReceived;
 
-            while (radio.available()) {
-                //len = radio.getDynamicPayloadSize();
-                const uint16_t len = sizeof(MsgToSend);
-                radio.read(&dataReceived, len);
-                delay(20);
+        //delayMicroseconds(20);
+        //delay(500);
+    }
 
-                printf("(%5i) Recv: size=%i Data=%i pipe=%i\n",
-                       dataCounter, len, dataReceived.data, dataReceived.id);
+    return 0;
+}
 
-                if (dataReceived.data < 1000) {
-//                    digitalWrite(pin, 1);
-//                    delay(250);
-//                    digitalWrite(pin, 0);
+void sendData(RF24 &radio, RF24Client &client) {
+    MsgToSend msgToSend{asInt(role), 42};
 
-                    uint8_t clientID = 99;
-                    if(dataReceived.id == 1) {
-                        client1.enableWriting();
-                        clientID = 1;
-                    } else {
-                        client2.enableWriting();
-                        clientID = 2;
-                    }
-                    //radio.openWritingPipe(channel1.getOutAddress());
-                    delay(50);
+    radio.stopListening();
 
-                    radio.stopListening();
-                    const bool result = radio.write(&dataReceived,len);
-                    radio.startListening();
+    client.enableWriting();
 
-                    if(result == true) {
-                        printf("%i bytes written to client %i!\n",len,clientID);
-                    } else {
-                        printf("Could not write to Client %i\n",clientID);
-                    }
+    const bool result = radio.write(&msgToSend, sizeof(msgToSend));
+    if (result) {
+        printf("Message sent to client!\n");
+    } else {
+        printf("Could not write to Client\n");
+    }
 
-                }
+    radio.startListening();
+}
+
+void fetchData() {
+    MsgToSend dataReceived;
+    uint16_t dataCounter{};
+
+    while (radio.available()) {
+        //len = radio.getDynamicPayloadSize();
+        const uint16_t len = sizeof(MsgToSend);
+        radio.read(&dataReceived, len);
+        delay(20);
+
+        printf("(%5i) Recv: size=%i Data=%i pipe=%i\n", dataCounter, len, dataReceived.data, dataReceived.id);
+
+//        if (dataReceived.data < 1000) {
+////                    digitalWrite(pin, 1);
+////                    delay(250);
+////                    digitalWrite(pin, 0);
+//
+//            uint8_t clientID = 99;
+//            if (dataReceived.id == 1) {
+//                client1.enableWriting();
+//                clientID = 1;
+//            } else {
+//                client2.enableWriting();
+//                clientID = 2;
+//            }
+//            //radio.openWritingPipe(channel1.getOutAddress());
+//            delay(50);
+//
+//            radio.stopListening();
+//            const bool result = radio.write(&dataReceived, len);
+//            radio.startListening();
+//
+//            if (result == true) {
+//                printf("%i bytes written to client %i!\n", len, clientID);
+//            } else {
+//                printf("Could not write to Client %i\n", clientID);
+//            }
+//
+//        }
 
 //                // Send back payload to sender
 //                radio.stopListening();
@@ -172,14 +211,7 @@ int main(int argc, char** argv) {
 //
 //                radio.startListening();
 
-                dataCounter++;
-            }
-
-        }
-
-        //delayMicroseconds(20);
-        //delay(500);
+        dataCounter++;
     }
 
-    return 0;
 }
