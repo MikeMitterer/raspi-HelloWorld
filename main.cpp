@@ -32,7 +32,6 @@ void sendData(RF24& radio, RF24Client& client);
 
 int main(int argc, char **argv) {
 
-
     if (!board.init()) {
         printf("GPIO initialization failed!\n");
     }

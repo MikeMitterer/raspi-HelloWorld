@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 # List of directories to search for CMake modules.
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
 include(Toolchain-RaspberryPi)
-include(Config)
+#include(Config)
 
 project(RaspiHelloWorld)
 
@@ -25,6 +25,7 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 
 )
 
+#set(CMAKE_PREFIX_PATH ${RF24PATH} ${CMAKE_PREFIX_PATH})
 
 # Bei der Aktivierung muss auch der Teil in target_link_libraries
 # wieder aktiviert werden!
@@ -38,12 +39,12 @@ set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH}
 
 find_library(RF24
         NAMES librf24-bcm.so librf24-bcm.so.1
-        HINTS "
-              ${PIROOT}/usr/local/lib
-              "
+        HINTS ${PIROOT}
 )
-message( STATUS "WIRINGPI:   " ${WIRINGPI} )
-message( STATUS "PIROOT:     " ${PIROOT} )
+
+message( STATUS "WIRINGPI:                " ${WIRINGPI} )
+message( STATUS "PIROOT:                  " ${PIROOT} )
+message( STATUS "RF24:                    " ${RF24} )
 
 #find_library(PTHREAD
 #        NAMES libpthread libpthread.so libpthread.so.0
