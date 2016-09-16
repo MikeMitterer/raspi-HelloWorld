@@ -21,6 +21,7 @@ set(FLAGS "${FLAGS} -Wl,-rpath-link,${PIROOT}/usr/lib/arm-linux-gnueabihf")
 set(FLAGS "${FLAGS} -Wl,-rpath-link,${PIROOT}/usr/local/lib")
 set(RPATH_FLAGS ${FLAGS})
 
+# which compilers to use for C and C++
 SET(CMAKE_C_COMPILER ${CROSS_COMPILER}gcc)
 SET(CMAKE_CXX_COMPILER ${CROSS_COMPILER}g++)
 SET(CMAKE_ASM_COMPILER ${CROSS_COMPILER}as)
@@ -35,6 +36,7 @@ UNSET(CMAKE_CXX_FLAGS CACHE)
 SET(CMAKE_CXX_FLAGS ${RPATH_FLAGS} CACHE STRING "c++ flags" FORCE)
 SET(CMAKE_C_FLAGS ${RPATH_FLAGS} CACHE STRING "c flags" FORCE)
 
+# here is the target environment located
 SET(CMAKE_SYSROOT ${PIROOT})
 SET(CMAKE_FIND_ROOT_PATH ${PIROOT})
 
