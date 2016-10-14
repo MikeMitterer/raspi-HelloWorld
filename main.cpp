@@ -144,7 +144,8 @@ int main(int argc, char **argv) {
 }
 
 void sendData(RF24 &radio, RF24Client &client) {
-    MsgToSend msgToSend{asInt(role), 42};
+    // MsgToSend msgToSend{asInt(role), 42};
+    MsgToSend msgToSend{LED, 42};
 
     radio.stopListening();
 

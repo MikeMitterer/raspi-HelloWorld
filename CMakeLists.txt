@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 # List of directories to search for CMake modules.
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake ${CMAKE_MODULE_PATH})
 
-include(Toolchain-RaspberryPi)
+#include(Toolchain-RaspberryPi)
 
 #include(Config)
 
@@ -63,7 +63,7 @@ set(SOURCE_FILES
         include/GPIO.h
         ${SHARED_FOLDER}/rf24/rf24.cpp
         ${SHARED_FOLDER}/rf24/ReadingPipe.hpp
-        )
+        ${SHARED_FOLDER}/rf24/MsgToSend.hpp)
 
 add_executable(RaspiHelloWorld ${SOURCE_FILES})
 
