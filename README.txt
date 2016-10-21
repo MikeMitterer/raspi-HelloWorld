@@ -164,3 +164,10 @@ https://gist.github.com/massenz/41bb2c8375294f4d9927
   550  ln -snf /usr/local/Cellar/gtest/gtest-1.7/build/googlemock/libgmock_main.a
   551  ls -la libg*
 
+
+Crosscompile on Mac
+    http://www.jaredwolff.com/blog/cross-compiling-on-mac-osx-for-raspberry-pi/
+
+    /Volumes/RPi-EABI/src
+    /Volumes/RPi-EABI/.build
+    /Volumes/RPi-EABI-small/${CT_TARGET}
